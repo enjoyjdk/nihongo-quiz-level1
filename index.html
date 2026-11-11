@@ -1,111 +1,271 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>日本語語彙チャレンジ</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>にほんご クイズ</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff6ee;--card:#fff;--ink:#4b3a3f;--sub:#8f7c80;--pink:#ff8fab;--pinkbg:#ffe3ea;--mint:#3fbf8f;--mintbg:#d9f5e8;--red:#f06a6a;--redbg:#ffe1e1;--line:#f1dccf;--sun:#ffd166;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a2125;--card:#382c31;--ink:#fbeef0;--sub:#c3aab0;--pink:#ff9db5;--pinkbg:#4d3139;--mint:#5fd9a9;--mintbg:#24463a;--red:#ff8585;--redbg:#53302f;--line:#4f3d44}}
+:root[data-theme="dark"]{--bg:#2a2125;--card:#382c31;--ink:#fbeef0;--sub:#c3aab0;--pink:#ff9db5;--pinkbg:#4d3139;--mint:#5fd9a9;--mintbg:#24463a;--red:#ff8585;--redbg:#53302f;--line:#4f3d44}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-weight:500;line-height:1.5}
+#app{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.9rem;font-weight:900;margin:8px 0 2px;text-align:center}
+.lead{text-align:center;color:var(--sub);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cat{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px 8px;font:inherit;color:var(--ink);cursor:pointer;text-align:center;min-height:116px}
+.cat .ic{display:block;font-size:2rem}
+.cat b{display:block;font-size:1.15rem;font-weight:900}
+.cat small{color:var(--sub)}
+.cat:hover,.opt:hover:not(:disabled),.big:hover{border-color:var(--pink)}
+button:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:26px;padding:24px 16px;text-align:center;margin:12px 0 16px}
+.hint{color:var(--sub);font-size:.95rem}
+.prompt{font-size:2.2rem;font-weight:900;margin-top:6px;word-break:break-word}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ghost{background:none;border:0;font:inherit;color:var(--sub);cursor:pointer;padding:8px 4px}
+.bar{height:12px;background:var(--pinkbg);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pink);border-radius:9px;transition:width .3s}
+.opts{display:grid;gap:10px}
+.opt,.big{width:100%;min-height:58px;padding:14px 18px;border:2px solid var(--line);background:var(--card);border-radius:18px;font:inherit;font-size:1.15rem;color:var(--ink);cursor:pointer;text-align:left}
+.big{text-align:center;font-weight:900;margin-top:10px}
+.big.main{background:var(--pink);border-color:var(--pink);color:#fff}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--mintbg);border-color:var(--mint)}
+.opt.ng{background:var(--redbg);border-color:var(--red)}
+.fb{margin-top:14px;padding:14px;border-radius:18px;text-align:center;font-size:1.05rem}
+.fb.ok{background:var(--mintbg)}.fb.ng{background:var(--redbg)}
+.fb b{font-size:1.3rem;display:block}
+.score{font-size:3.4rem;font-weight:900;color:var(--pink);line-height:1.1}
+.pct{font-size:1.6rem;font-weight:700}
+.stars{font-size:2rem;margin:6px 0}
+@media (min-width:520px){.prompt{font-size:2.6rem}}
+.gm .opt{font-size:1.4rem;text-align:center}
+.prompt.sm{font-size:1.8rem;line-height:1.7;word-break:keep-all;overflow-wrap:normal}
+.nb{white-space:nowrap}
+.wide .hint,.kk{word-break:keep-all}
+@media (max-width:380px){.prompt.sm{font-size:1.55rem}.card.wide{padding:20px 12px}}
+@media (min-width:760px){.card.wide{width:min(96vw,940px);margin-left:calc(50% - min(48vw,470px))}.prompt.sm{font-size:1.7rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
 <body>
-  <main class="app">
+<div id="app"></div>
+<script>
+const rand=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
 
-    <!-- ① スタート画面 -->
-    <section id="screen-start" class="screen start">
-      <div class="hero" aria-hidden="true">
-        <svg viewBox="0 50 600 210" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <g id="blossom">
-              <ellipse cx="0" cy="-9" rx="6" ry="9"/>
-              <ellipse cx="0" cy="-9" rx="6" ry="9" transform="rotate(72)"/>
-              <ellipse cx="0" cy="-9" rx="6" ry="9" transform="rotate(144)"/>
-              <ellipse cx="0" cy="-9" rx="6" ry="9" transform="rotate(216)"/>
-              <ellipse cx="0" cy="-9" rx="6" ry="9" transform="rotate(288)"/>
-              <circle r="3" fill="#ffe27a"/>
-            </g>
-          </defs>
-          <rect width="600" height="260" fill="#cfeaff"/>
-          <circle cx="170" cy="138" r="56" fill="#ff8d9a"/>
-          <path d="M110 260 L290 70 Q300 60 310 70 L490 260 Z" fill="#5d9be8"/>
-          <path d="M255 102 L290 70 Q300 60 310 70 L346 106 L322 96 L308 112 L292 94 L276 110 Z" fill="#fff"/>
-          <path d="M0 260 L0 214 Q120 190 250 222 Q420 250 600 208 L600 260 Z" fill="#8fc2f5"/>
-          <g fill="#ff9bb8">
-            <use href="#blossom" x="62" y="100" transform="scale(1.3)"/>
-            <use href="#blossom" x="450" y="80" transform="scale(1.2)"/>
-            <use href="#blossom" x="520" y="95"/>
-            <use href="#blossom" x="395" y="170" transform="scale(.9)"/>
-            <use href="#blossom" x="70" y="195" transform="scale(1.1)"/>
-            <use href="#blossom" x="545" y="190" transform="scale(1.4)"/>
-          </g>
-          <g fill="#ffc2d4">
-            <circle cx="30" cy="150" r="4"/><circle cx="130" cy="75" r="5"/>
-            <circle cx="360" cy="70" r="4"/><circle cx="480" cy="150" r="5"/>
-            <circle cx="215" cy="235" r="4"/><circle cx="590" cy="140" r="4"/>
-          </g>
-        </svg>
-      </div>
-      <div class="start-body">
-        <h1>日本語<br class="sp-only">語彙チャレンジ</h1>
-        <p class="lead">10もん チャレンジ！</p>
-        <p class="rule">4つの こたえから、ただしいものを えらんでください。<br>1もん せいかいで 10てん です。</p>
-        <button id="btn-start" class="btn primary" type="button">START</button>
-      </div>
-    </section>
+/* ===== データ [にほんご, Deutsch] ===== */
+const D={
+ days:{ic:'📅',jp:'ようび',de:'Wochentage',items:[
+  ['にちようび','Sonntag'],['げつようび','Montag'],['かようび','Dienstag'],['すいようび','Mittwoch'],['もくようび','Donnerstag'],['きんようび','Freitag'],['どようび','Samstag'],
+  ['きょう','heute'],['あした','morgen'],['きのう','gestern'],['まいにち','jeden Tag'],['しゅうまつ','Wochenende'],['なんようび','welcher Wochentag'],['らいしゅう','nächste Woche']]},
+ jobs:{ic:'💼',jp:'しごと',de:'Berufe',items:[
+  ['せんせい','Lehrer/in'],['がくせい','Student/in'],['いしゃ','Arzt/Ärztin'],['かんごし','Krankenpfleger/in'],['かいしゃいん','Angestellte/r'],['エンジニア','Ingenieur/in'],['コック','Koch/Köchin'],['べんごし','Anwalt/Anwältin'],['うんてんしゅ','Fahrer/in'],['けいさつかん','Polizist/in'],['てんいん','Verkäufer/in'],['びようし','Friseur/in'],['パイロット','Pilot/in'],['ぎんこういん','Bankangestellte/r'],['しゅふ','Hausfrau/Hausmann']]},
+ places:{ic:'🏫',jp:'ばしょ',de:'Orte',items:[
+  ['がっこう','Schule'],['えき','Bahnhof'],['びょういん','Krankenhaus'],['ぎんこう','Bank'],['ゆうびんきょく','Post'],['としょかん','Bibliothek'],['スーパー','Supermarkt'],['レストラン','Restaurant'],['こうえん','Park'],['ホテル','Hotel'],['くうこう','Flughafen'],['デパート','Kaufhaus'],['トイレ','Toilette'],['パンや','Bäckerei'],['うち','Zuhause']]},
+ people:{ic:'👨‍👩‍👧',jp:'ひと・かぞく',de:'Personen & Familie',items:[
+  ['ちち','(mein) Vater'],['はは','(meine) Mutter'],['あに','(mein) älterer Bruder'],['あね','(meine) ältere Schwester'],['おとうと','(mein) jüngerer Bruder'],['いもうと','(meine) jüngere Schwester'],['おじいさん','Großvater'],['おばあさん','Großmutter'],['りょうしん','Eltern'],['かぞく','Familie'],['ともだち','Freund/in'],['こども','Kind'],['おとこのひと','Mann'],['おんなのひと','Frau']]},
+ count:{ic:'🍙',jp:'かぞえかた',de:'Zählen',items:[
+  ['ひとり','1 Person'],['ふたり','2 Personen'],['さんにん','3 Personen'],['よにん','4 Personen'],['ひとつ','1 Stück (allgemein)'],['ふたつ','2 Stück (allgemein)'],['みっつ','3 Stück (allgemein)'],['ごさつ','5 Bücher'],['さんまい','3 Blatt Papier / Hemden'],['いっぱい','1 Tasse / 1 Glas'],['さんばい','3 Tassen / 3 Gläser'],['ろっぱい','6 Tassen / 6 Gläser'],['いっぽん','1 langer Gegenstand (z. B. Stift)'],['さんぼん','3 lange Gegenstände'],['にひき','2 kleine Tiere'],['さんびき','3 kleine Tiere'],['にだい','2 Autos / Maschinen'],['はっさい','8 Jahre alt'],['はたち','20 Jahre alt']]}
+};
+const CATS=['days','jobs','places','people','count','price'];
+D.price={ic:'💴',jp:'ねだん',de:'Preise'};
 
-    <!-- ② 問題画面 -->
-    <section id="screen-quiz" class="screen quiz" hidden>
-      <header class="hud">
-        <div class="hud-box">
-          <span class="hud-label">SCORE</span>
-          <span id="hud-score" class="hud-value">0</span>
-        </div>
-        <div class="hud-box center">
-          <span class="hud-label">QUESTION</span>
-          <span class="hud-value"><span id="hud-number">1</span> / <span id="hud-total">10</span></span>
-        </div>
-        <div class="hud-box right">
-          <span class="hud-label">STREAK</span>
-          <span class="hud-value"><span id="hud-fire" class="fire" aria-hidden="true"></span><span id="hud-streak">0</span></span>
-        </div>
-      </header>
+/* ===== ねだんの よみかた ===== */
+const O=['','いち','に','さん','よん','ご','ろく','なな','はち','きゅう'];
+const T=['','せん','にせん','さんぜん','よんせん','ごせん','ろくせん','ななせん','はっせん','きゅうせん'];
+const H=['','ひゃく','にひゃく','さんびゃく','よんひゃく','ごひゃく','ろっぴゃく','ななひゃく','はっぴゃく','きゅうひゃく'];
+const J=['','じゅう','にじゅう','さんじゅう','よんじゅう','ごじゅう','ろくじゅう','ななじゅう','はちじゅう','きゅうじゅう'];
+function yen(n){const a=Math.floor(n/1000),b=Math.floor(n/100)%10,c=Math.floor(n/10)%10,d=n%10;
+ return T[a]+H[b]+J[c]+(d===4?'よ':O[d])+'えん'}
+const VAR=[['びゃく','ひゃく'],['ろっぴゃく','ろくひゃく'],['はっぴゃく','はちひゃく'],['ぜん','せん'],['はっせん','はちせん'],['よえん','よんえん']];
+function priceOpts(n){
+ const ans=yen(n),s=new Set();
+ const vs=shuffle(VAR.filter(v=>ans.includes(v[0])));
+ if(vs.length)s.add(ans.replace(vs[0][0],vs[0][1]));
+ let t=0;
+ while(s.size<3&&t++<500){
+  const ds=String(n).split(''),i=rand(ds.length);ds[i]=String(rand(10));
+  const m=+ds.join('');
+  if(m>=1&&m!==n){const r=yen(m);if(r!==ans)s.add(r)}
+ }
+ return shuffle([ans,...[...s].slice(0,3)]);
+}
+function priceNums(){
+ const s=new Set();
+ while(s.size<10){const d=[1,2,3,3,4,4,4][rand(7)];s.add(rand(9*10**(d-1))+10**(d-1))}
+ return shuffle([...s]);
+}
 
-      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="1">
-        <div id="progress-bar" class="progress-bar"></div>
-      </div>
+/* ===== 効果音 (Web Audio API) ===== */
+let AC=null;
+function ac(){try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}if(AC&&AC.state!=='running')AC.resume()}catch(e){}return AC}
+function tone(f,t0,d,type,vol){const c=AC,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+0.012);g.gain.exponentialRampToValueAtTime(0.0001,t0+d);o.connect(g);g.connect(c.destination);o.start(t0);o.stop(t0+d+0.03)}
+function sfx(ok){try{const c=ac();if(!c)return;const t=c.currentTime+0.02;
+ if(ok){tone(988,t,0.2,'sine',0.1);tone(1319,t+0.14,0.4,'sine',0.1)}
+ else{tone(208,t,0.13,'triangle',0.13);tone(185,t+0.17,0.17,'triangle',0.13)}}catch(e){}}
+['pointerdown','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,ac,{once:true,passive:true}));
 
-      <div class="question-card">
-        <span id="q-type" class="tag">漢字の よみ</span>
-        <h2 id="q-text" class="q-text"></h2>
-      </div>
+/* ===== ぶんぽうれんしゅう (データ + 問題生成) ===== */
+const GK=['g1','g2','g3','g4','g5','g6','g7'];
+// 問題文の表示用: 「ことば＋（　）」を1かたまりにして、かたまりの間だけで改行する
+const fmt=s=>s.replace(/([^\s<>（）]+)（　）/g,'<span class="nb">$1（　）</span><wbr>');
+D.g1={ic:'🍞',jp:'① は・を',de:'たべます・のみます'};
+D.g2={ic:'🍵',jp:'② は・を',de:'たべました・のみました'};
+D.g3={ic:'🙅',jp:'③ は・は',de:'たべません・のみません'};
+D.g4={ic:'👭',jp:'④ も',de:'おなじ ぶん'};
+D.g5={ic:'📅',jp:'⑤ ようび＋に',de:'げつようびに…'};
+D.g6={ic:'🍴',jp:'⑥ ばしょ＋で',de:'カフェで…'};
+D.g7={ic:'💬',jp:'⑦ だれ？ なに？ どこ？ いつ？',de:'ぶんを よんで こたえよう'};
+const P=['わたし','おとうさん','おかあさん','おにいさん','おねえさん','いもうと','おとうと','せんせい','ともだち'];
+const F=[['パン','た'],['ごはん','た'],['コーヒー','の'],['おちゃ','の'],['みず','の'],['ジュース','の']]; // [たべもの/のみもの, た=たべる の=のむ]
+const DY=['げつようび','かようび','すいようび','もくようび','きんようび','どようび','にちようび'];
+const PL=['いえ','がっこう','しょくどう','レストラン','カフェ','こうえん'];
+const pk=a=>a[rand(a.length)];
+const vb=(f,s)=>(f[1]==='た'?'たべ':'のみ')+s;
+const mk=(hint,s,ans,wr,full)=>({hint,p:s,o:shuffle([ans,...shuffle(wr).slice(0,3)]),a:ans,full,sm:1});
+function build(gen){const seen=new Set(),out=[];for(let t=0;out.length<10&&t<2000;t++){const q=gen(out.length),k=q.k||q.p;if(!seen.has(k)){seen.add(k);out.push(q)}}return out}
+const H0='（　）に はいる ことばは どれ？';
+const pq=(ans,wr,fm,hint)=>()=>build(()=>{
+ const p=pk(P),f=pk(F),v=vb(f,pk(fm)),a=ans.split('・');
+ return mk(hint,`${p}（　）${f[0]}（　）${v}。`,ans,wr,`${p}${a[0]} ${f[0]}${a[1]} ${v}。`)});
+const WR12=['を・は','に・を','は・で','で・を','を・を','に・は'];
+const WR3=['を・は','に・は','で・は','は・に','は・で','に・に']; // 「は・を」は ふくめない
+const GR={
+ g1:pq('は・を',WR12,['ます'],H0),
+ g2:pq('は・を',WR12,['ました'],H0),
+ g3:pq('は・は',WR3,['ません'],'『は・は』を つかって、ぶんを つくりましょう。'),
+ g4:()=>{ // も: 8つの どうしの かたちを ばらんすよく
+  const all=[];['た','の'].forEach(t=>['ます','ました','ません','ませんでした'].forEach(s=>all.push([t,s])));
+  const fs=[...shuffle(all),...shuffle(all).slice(0,2)];
+  return build(i=>{
+   const [t,s]=fs[i],f=pk(F.filter(x=>x[1]===t)),v=vb(f,s),a=pk(P),b=pk(P.filter(x=>x!==a)),
+   s1=`${a}は ${f[0]}を ${v}。`;
+   return mk('おなじ いみに なるように えらびましょう。',`${s1}<br>${b}（　）${f[0]}を ${v}。`,'も',['を','に','で','へ'],`${s1}<br>${b}も ${f[0]}を ${v}。`)})},
+ g5:()=>{
+  const ds=[...shuffle(DY),...shuffle(DY).slice(0,3)];
+  return build(i=>{
+   const p=pk(P),f=pk(F),v=vb(f,pk(['ます','ました'])),d=ds[i];
+   return mk(H0,`${p}は ${d}（　）${f[0]}を ${v}。`,'に',['を','で','へ','が'],`${p}は ${d}に ${f[0]}を ${v}。`)})},
+ g6:()=>{
+  const ls=[...shuffle(PL),...shuffle(PL).slice(0,4)];
+  return build(i=>{
+   const p=pk(P),f=pk(F),v=vb(f,pk(['ます','ました'])),l=ls[i];
+   return mk(H0,`${p}は ${l}（　）${f[0]}を ${v}。`,'で',['に','を','へ','が'],`${p}は ${l}で ${f[0]}を ${v}。`)})},
+ g7:()=>{
+  const ts=shuffle([0,1,2,3,0,1,2,3,...shuffle([0,1,2,3]).slice(0,2)]);
+  return build(i=>{
+   const p=pk(P),f=pk(F),d=pk(DY),l=pk(PL),v=vb(f,'ました'),t=ts[i],
+   s=`${p}は ${d}に ${l}で ${f[0]}を ${v}。`,
+   qs=[`だれが ${v}か。`,`なにを ${v}か。`,`どこで ${v}か。`,`いつ ${v}か。`],
+   ans=[p,f[0],l,d];
+   return{hint:'しつもんに こたえましょう。',k:s,p:`${s}<br><span style='color:var(--pink);font-weight:900'>${qs[t]}</span>`,o:shuffle(ans),a:ans[t],full:s,sm:1}})}
+};
 
-      <div id="choices" class="choices"></div>
+/* ===== はなび (10もん ぜんぶ せいかいの ときだけ) ===== */
+function fireworks(){
+ const cv=document.createElement('canvas');
+ cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99';
+ document.body.appendChild(cv);
+ const W=cv.width=innerWidth,Hh=cv.height=innerHeight,x=cv.getContext('2d');
+ const cols=['#ff8fab','#ffd166','#5fd9a9','#7ec8ff','#c49bff','#ff9f68'];
+ let ps=[],t0=null,next=0;
+ function burst(){const cx=W*(.15+Math.random()*.7),cy=Hh*(.12+Math.random()*.4),c=pk(cols);
+  for(let i=0;i<48;i++){const a=Math.PI*2*i/48,s=2+Math.random()*3.5;ps.push({x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,c})}}
+ function f(t){
+  if(t0===null)t0=t;const e=t-t0;
+  if(e<2200&&e>=next){burst();next+=450}
+  x.clearRect(0,0,W,Hh);
+  ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.045;p.vx*=.985;p.l-=.012;x.globalAlpha=Math.max(p.l,0);x.fillStyle=p.c;x.beginPath();x.arc(p.x,p.y,2.8,0,7);x.fill()});
+  ps=ps.filter(p=>p.l>0);
+  if(e<4000&&(e<2200||ps.length))requestAnimationFrame(f);else cv.remove();
+ }
+ requestAnimationFrame(f);
+}
 
-      <div id="feedback" class="feedback" aria-live="polite"></div>
+/* ===== がめん いどう ===== */
+const isG=()=>/^g\d/.test(S.cat);
+const menu=()=>isG()?gramHome():wordHome();
+function gramPick(k){S.cat=k;S.dir='g';start()}
+function gramHome(){
+ app.innerHTML=`<div class="top"><button class="ghost" onclick="home()">← ホーム</button></div><h1><span aria-hidden="true">📖</span> ぶんぽうれんしゅう <span aria-hidden="true">🌸</span></h1><p class="lead">れんしゅうを えらんでね</p>
+ <div class="grid">${GK.map(k=>`<button class="cat" ${k==='g7'?"style='grid-column:1/-1'":''} onclick="gramPick('${k}')"><span class="ic">${D[k].ic}</span><b>${D[k].jp}</b><small>${D[k].de}</small></button>`).join('')}</div>`;
+}
 
-      <button id="btn-next" class="btn primary" type="button" disabled>NEXT</button>
-    </section>
+/* ===== 状態 ===== */
+const app=document.getElementById('app');
+let S={cat:null,dir:'de-jp',qs:[],i:0,score:0};
 
-    <!-- ③ 結果画面 -->
-    <section id="screen-result" class="screen result" hidden>
-      <h2 class="result-title">おつかれさま！</h2>
-      <p class="result-sub">10もん おわりました</p>
-
-      <div class="score-panel">
-        <span class="hud-label">TOTAL SCORE</span>
-        <p class="big-score"><span id="res-score">0</span><span class="big-of"> / 100</span></p>
-        <p id="res-message" class="res-message"></p>
-      </div>
-
-      <div class="correct-panel">
-        <span class="hud-label">CORRECT</span>
-        <span class="correct-value"><span id="res-correct">0</span> / 10</span>
-      </div>
-
-      <button id="btn-again" class="btn primary" type="button">PLAY AGAIN</button>
-    </section>
-
-  </main>
-
-  <script src="quiz-data.js"></script>
-  <script src="script.js"></script>
+function home(){
+ app.innerHTML=`<h1>にほんご クイズ 🌸</h1><p class="lead">どちらを れんしゅう する?</p>
+ <button class="big main" style="min-height:88px;font-size:1.4rem;margin-top:18px" onclick="wordHome()">☆ ことばのれんしゅう</button>
+ <button class="big" style="min-height:88px;font-size:1.4rem;margin-top:14px" onclick="gramHome()">☆ ぶんぽうれんしゅう</button>`;
+}
+function wordHome(){
+ app.innerHTML=`<div class="top"><button class="ghost" onclick="home()">← ホーム</button></div><h1>ことばのれんしゅう</h1><p class="lead">Deutsch ⇄ 日本語 · 10 Fragen</p>
+ <p class="lead" style="margin-top:-8px">カテゴリーを えらんでね</p>
+ <div class="grid">${CATS.map(k=>`<button class="cat" onclick="pick('${k}')"><span class="ic">${D[k].ic}</span><b>${D[k].jp}</b><small>${D[k].de}</small></button>`).join('')}</div>`;
+}
+function pick(k){
+ S.cat=k;
+ if(k==='price'){S.dir='price';start();return}
+ app.innerHTML=`<div class="top"><button class="ghost" onclick="wordHome()">← もどる</button></div>
+ <h1>${D[k].ic} ${D[k].jp}</h1><p class="lead">${D[k].de}</p>
+ <button class="big main" onclick="S.dir='de-jp';start()">ドイツご → にほんご</button>
+ <button class="big" onclick="S.dir='jp-de';start()">にほんご → ドイツご</button>`;
+}
+function start(){
+ S.i=0;S.score=0;
+ if(isG()){S.qs=GR[S.cat]();showQ();return}
+ if(S.cat==='price'){
+  S.qs=priceNums().map(n=>({hint:'いくら? よみかたは どれ?',p:'¥'+n.toLocaleString('en-US'),o:priceOpts(n),a:yen(n),full:'¥'+n.toLocaleString('en-US')+' = '+yen(n)}));
+ }else{
+  const pool=D[S.cat].items,jd=S.dir==='jp-de',ai=jd?1:0,pi=jd?0:1;
+  S.qs=shuffle(pool).slice(0,10).map(it=>{
+   const ds=shuffle(pool.filter(x=>x[ai]!==it[ai])).slice(0,3).map(x=>x[ai]);
+   return{hint:jd?'にほんご → ドイツご':'ドイツご → にほんご',p:it[pi],o:shuffle([it[ai],...ds]),a:it[ai],full:it[1]+' = '+it[0]};
+  });
+ }
+ showQ();
+}
+function showQ(){
+ const q=S.qs[S.i];
+ app.innerHTML=`<div class="top"><button class="ghost" onclick="home()">← やめる</button><span>${q.sm?'<span aria-hidden="true">📖</span> ':''}${S.i+1} / 10</span><span>⭐ ${S.score}</span></div>
+ <div class="bar"><i style="width:${S.i*10}%"></i></div>
+ <div class="card${q.sm?' wide':''}"><div class="hint">${q.hint}</div><div class="prompt${q.sm?' sm':''}">${q.sm?fmt(q.p):q.p}</div></div>
+ <div class="opts${q.sm?' gm':''}">${q.o.map((t,k)=>`<button class="opt" data-k="${k}">${t}</button>`).join('')}</div><div id="fb"></div>`;
+ app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(b));
+}
+function answer(btn){
+ const q=S.qs[S.i],ok=q.o[+btn.dataset.k]===q.a;
+ if(ok)S.score++;
+ sfx(ok);
+ app.querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(q.o[+b.dataset.k]===q.a)b.classList.add('ok')});
+ if(!ok)btn.classList.add('ng');
+ const last=S.i===9;
+ document.getElementById('fb').innerHTML=`<div class="fb ${ok?'ok':'ng'}${q.sm?' kk':''}"><b>${ok?'⭕ せいかい!':'❌ ざんねん…'}</b>${q.full}</div>
+ <button class="big main" id="nx">${last?'けっかを みる 🎉':'つぎへ ▶'}</button>`;
+ const nx=document.getElementById('nx');
+ nx.onclick=()=>{S.i++;last?result():showQ()};
+ nx.scrollIntoView({behavior:'smooth',block:'nearest'});
+ nx.focus({preventScroll:true});
+}
+function result(){
+ const pct=Math.round(S.score*10);
+ const m=S.score===10?['🎉','パーフェクト！おめでとう！']:S.score>=9?['🎉','すごい! かんぺき!']:S.score>=7?['🌟','よくできました!']:S.score>=5?['😊','あと すこし!']:['💪','もういちど がんばろう!'];
+ app.innerHTML=`<h1>けっか</h1><div class="card"><div class="stars">${m[0]}</div>
+ <div class="hint">${D[S.cat].ic} ${D[S.cat].jp}</div>
+ <div class="score">${S.score} / 10</div><div class="pct">せいかいりつ ${pct}%</div><p>${m[1]}</p></div>
+ <button class="big main" onclick="start()">もういちど ちょうせん 🔁</button>
+ <button class="big" onclick="menu()">カテゴリーを えらぶ</button>
+ <button class="big" onclick="home()">ホームにもどる</button>`;
+ if(S.score===10)fireworks();
+}
+home();
+</script>
 </body>
 </html>
